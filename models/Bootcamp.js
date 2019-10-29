@@ -41,13 +41,11 @@ const BootcampSchema = new mongoose.Schema(
       // GeoJSON Point
       type: {
         type: String,
-        enum: ["Point"],
-        required: true
+        enum: ["Point"]
       },
       coordinates: {
         type: [Number],
-        index: "2dsphere",
-        required: true
+        index: "2dsphere"
       },
       formattedAddress: String,
       street: String,
@@ -101,13 +99,8 @@ const BootcampSchema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.ObjectId,
-      ref: "User",
-      required: true
+      ref: "User"
     }
-  },
-  {
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true }
   }
 );
 
