@@ -8,7 +8,19 @@ const asyncHandler = require("../middleware/async");
 // @route   GET /api/v1/bootcamps
 // @access  Public
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-  const bootcamps = await Bootcamp.find();
+  //console.log(req.query)
+  let query;
+  let queryStr = JSON.stringify(req.query);
+  // end regex add g char so that it look 
+  // globally and not just the first found.
+  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+  //console.log(queryStr);
+
+  // find in database the query string after parsed
+  query = Bootcamp.find(JSON.parse(queryStr));
+
+  // await for manipulated query string.
+  const bootcamps = await query; 
 
   res
     .status(200)
@@ -80,5 +92,22 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
   const { zipcode, distance } = req.params;
 
   // Get lat/lng from geocoder
+  const loc = await geocoder.geocode(zipcode);
+  const lat = loc[0].latitude;
+  const lng = loc[0].longitude;
 
+  // Calc radius using radians
+  // Divide dist by radius of Earth
+  // Earth radius = 3,963 miles / 6,378 km
+  const radius = distance / 3963
+
+  const bootcamps = await Bootcamp.find({
+    location: {$geoWithin: { $centerSphere: [ [ lng, lat ], radius ] } }
+  });
+
+  res.status(200).json({
+    success: true,
+    count: bootcamps.length,
+    data: bootcamps
+  });
 });
