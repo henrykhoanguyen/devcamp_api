@@ -8,6 +8,15 @@ const connectDB = require("./config/db");
 const errorHandler = require("./middleware/error");
 const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
+// add more header that make API more secure
+const helmet = require('helmet');
+// to prevent cross site scripting attack
+const xss = require('xss-clean');
+// control how many request is sent to server in a min
+const rateLimit = require('express-rate-limit');
+// prevent attacker pollute parameter
+const hpp = require('hpp');
+const cors = require('cors');
 
 // Load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -40,6 +49,25 @@ app.use(fileupload());
 
 // Sanitize data 
 app.use(mongoSanitize());
+
+// Set security header
+app.use(helmet());
+
+// Prevent XSS attack (cross site scripting attack)
+app.use(xss());
+
+// Rate limit
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 mins
+  max: 100
+});
+app.use(limiter);
+
+// Prevent http param pollution
+app.use(hpp());
+
+// Enable CORS
+app.use(cors());
 
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
