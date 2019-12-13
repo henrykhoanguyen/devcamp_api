@@ -24,12 +24,12 @@ router
     }),
     getCourses
   )
-  .post(protect, authorize('publisher', 'admin'), addCourse);
+  .post(protect, authorize("publisher", "admin"), addCourse);
 
 router
   .route("/:id")
   .get(getCourse)
-  .put(protect, authorize('publisher', 'admin'), updateCourse)
-  .delete(protect, authorize('publisher', 'admin'), deleteCourse);
+  .put(protect, authorize("publisher", "admin"), updateCourse)
+  .delete(protect, authorize("publisher", "admin"), deleteCourse);
 
 module.exports = router;
